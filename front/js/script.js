@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             data.forEach(product => {
                 const productLink = document.createElement('a');
-                productLink.setAttribute = ("href", `./product.html?id=${product._id}`);
+                productLink.setAttribute('href', `./product.html?id=${product._id}`);
 
                 const productArticle = document.createElement('article');
 
