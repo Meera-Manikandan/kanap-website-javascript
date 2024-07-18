@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(product => {
             const imgContainer = document.querySelector('.item__img');
             const productImg = document.createElement('img');
-            productImg.src = product.imageUrl;
-            productImg.alt = product.altTxt;
+            productImg.setAttribute('src', product.imageUrl);
+            productImg.setAttribute('alt', product.altTxt);
             imgContainer.appendChild(productImg);
 
             document.getElementById('title').textContent = product.name;
