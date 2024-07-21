@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+    document.querySelector('.cart__order__form').addEventListener('submit', handleFormSubmit);
 });
 
 function fetchProduct(id) {
@@ -125,4 +126,83 @@ function removeCartItem(productId, productColor) {
     cart = cart.filter(item => !(item.id === productId && item.color === productColor));
     localStorage.setItem('cart', JSON.stringify(cart));
     location.reload(); // Reload to reflect the updated cart
+}
+
+function handleFormSubmit(event) {
+    event.preventDefault();
+
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const email = document.getElementById('email').value.trim();
+
+    // Clear previous error messages
+    clearError('firstNameErrorMsg');
+    clearError('emailErrorMsg');
+
+    // Validate first name
+    if (firstName.toLowerCase() === 'test' || firstName.toLowerCase() === 'hello') {
+        displayError('firstNameErrorMsg', 'First name cannot be "test" or "hello".');
+        return;
+    }
+
+    // Validate email
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+        displayError('emailErrorMsg', 'Please enter a valid email address.');
+        return;
+    }
+
+    // Validate presence of all fields
+    if (!firstName || !lastName || !address || !city || !email) {
+        alert('All fields are required.');
+        return;
+    }
+
+    // Create contact object
+    const contact = {
+        firstName,
+        lastName,
+        address,
+        city,
+        email
+    };
+
+    // Create products array
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const products = cart.map(item => item.id);
+
+    // Send POST request
+    fetch('http://localhost:3000/api/products/order', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ contact, products })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.orderId) {
+                const orderId = data.orderId;
+                localStorage.removeItem('cart'); // Clear the cart
+                window.location.href = `confirmation.html?orderId=${orderId}`;
+            } else {
+                alert('There was an issue with your order. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+function clearError(elementId) {
+    document.getElementById(elementId).style.display = 'none';
+    document.getElementById(elementId).textContent = '';
+}
+
+function displayError(elementId, message) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.style.display = 'block';
+    errorElement.textContent = message;
 }
