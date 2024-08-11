@@ -139,11 +139,40 @@ function handleFormSubmit(event) {
 
     // Clear previous error messages
     clearError('firstNameErrorMsg');
+    clearError('lastNameErrorMsg');
+    clearError('addressErrorMsg');
+    clearError('cityErrorMsg');
     clearError('emailErrorMsg');
+
+    // Define regex patterns
+    const namePattern = /^[a-zA-Z\s]+$/; // Allows only letters and spaces
+    const addressPattern = /^[a-zA-Z0-9\s,]+$/; // Allows letters, numbers, spaces, and commas
 
     // Validate first name
     if (firstName.toLowerCase() === 'test' || firstName.toLowerCase() === 'hello') {
         displayError('firstNameErrorMsg', 'First name cannot be "test" or "hello".');
+        return;
+    }
+    if (!namePattern.test(firstName)) {
+        displayError('firstNameErrorMsg', 'First name can only contain letters and spaces.');
+        return;
+    }
+
+    // Validate last name
+    if (!namePattern.test(lastName)) {
+        displayError('lastNameErrorMsg', 'Last name can only contain letters and spaces.');
+        return;
+    }
+
+    // Validate address
+    if (!addressPattern.test(address)) {
+        displayError('addressErrorMsg', 'Address can only contain letters, numbers, spaces, and commas.');
+        return;
+    }
+
+    // Validate city
+    if (!namePattern.test(city)) {
+        displayError('cityErrorMsg', 'City can only contain letters and spaces.');
         return;
     }
 
