@@ -117,16 +117,53 @@ function updateCartItem(productId, productColor, newQuantity) {
     if (cartItem) {
         cartItem.quantity = newQuantity;
         localStorage.setItem('cart', JSON.stringify(cart));
-        location.reload(); // Reload to reflect the updated cart
+
+        // Update the item total price in the DOM
+        fetchProduct(productId).then(product => {
+            const itemTotalPrice = product.price * newQuantity;
+            const cartItemElement = document.querySelector(`.cart__item[data-id="${productId}"][data-color="${productColor}"]`);
+            const priceElement = cartItemElement.querySelector('.cart__item__content__description p:last-child');
+            priceElement.textContent = `€${itemTotalPrice.toFixed(2)}`;
+
+            // Update total quantity and total price
+            updateCartTotals();
+        });
     }
 }
+
 
 function removeCartItem(productId, productColor) {
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     cart = cart.filter(item => !(item.id === productId && item.color === productColor));
     localStorage.setItem('cart', JSON.stringify(cart));
-    location.reload(); // Reload to reflect the updated cart
+
+    // Remove the item from the DOM
+    const cartItemElement = document.querySelector(`.cart__item[data-id="${productId}"][data-color="${productColor}"]`);
+    cartItemElement.remove();
+
+    // Update total quantity and total price
+    updateCartTotals();
 }
+function updateCartTotals() {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let totalQuantity = 0;
+    let totalPrice = 0;
+
+    // Iterate over each item in the cart
+    const productPromises = cart.map(item =>
+        fetchProduct(item.id).then(product => {
+            totalQuantity += item.quantity;
+            totalPrice += product.price * item.quantity;
+        })
+    );
+
+    // Wait for all product data to be fetched and then update the totals
+    Promise.all(productPromises).then(() => {
+        document.getElementById('totalQuantity').textContent = totalQuantity;
+        document.getElementById('totalPrice').textContent = totalPrice.toFixed(2);
+    });
+}
+
 
 function handleFormSubmit(event) {
     event.preventDefault();
