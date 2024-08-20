@@ -118,7 +118,7 @@ function updateCartItem(productId, productColor, newQuantity) {
         cartItem.quantity = newQuantity;
         localStorage.setItem('cart', JSON.stringify(cart));
 
-        // Update the item total price in the DOM
+        // DOM Update on the item total price
         fetchProduct(productId).then(product => {
             const itemTotalPrice = product.price * newQuantity;
             const cartItemElement = document.querySelector(`.cart__item[data-id="${productId}"][data-color="${productColor}"]`);
@@ -157,7 +157,6 @@ function updateCartTotals() {
         })
     );
 
-    // Wait for all product data to be fetched and then update the totals
     Promise.all(productPromises).then(() => {
         document.getElementById('totalQuantity').textContent = totalQuantity;
         document.getElementById('totalPrice').textContent = totalPrice.toFixed(2);
